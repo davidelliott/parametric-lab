@@ -9,8 +9,7 @@
 
 // TO DO / known problems
 // bug- Grid has to be a square - i.e. cells_x = cells_y
-// feature- want option for cells to not be square
-// feature- want option to fill in the missing 2 walls
+// feature- option for cells to not be square
 
 // set parameters
 hole_size=50;
@@ -27,12 +26,44 @@ floor_thickness=0.5; // Set 0 for no base
 echo(total_x);
 echo(total_y);
 
-// build the object
+// build the objects
 main();
+
+translate([0,total_y+wall_width*1.5,0]){
+extra_wall();
+}
+
+rotate([0,0,-90]){
+translate([-total_x-wall_width,total_y+wall_width*1.5,0]){
+extra_wall(option=0);
+}
+}
 
 //////////////
 // MODULES //
 /////////////
+
+module extra_wall(option=1){
+	
+
+	difference(){
+	union(){
+		cube([total_x,wall_width,height]);
+rotate([180,0,90]){
+	translate([0,total_x,-height]){
+		if(option){connector_array(start=0,end=0);}
+	}
+}
+} // end of union
+// now remove the sockets
+		
+		translate([0,0,-2]){
+			connector_array(h=height+5,adj=1.1,start=0,end=cells_x-option);
+		}
+	}
+
+}
+
 
 module main(){
 difference() {
