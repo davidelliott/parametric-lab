@@ -9,10 +9,8 @@
 
 // TO DO / known problems
 // bug- Grid has to be a square - i.e. cells_x = cells_y
-// bug- taller walls do not have slots all the way down
 // feature- want option for cells to not be square
 // feature- want option to fill in the missing 2 walls
-// feature- want option to build a base
 
 // set parameters
 hole_size=50;
@@ -23,6 +21,7 @@ cells_x=3;
 cells_y=3;
 total_x=unit_length*cells_x;
 total_y=unit_length*cells_y;
+floor_thickness=0.5; // Set 0 for no base
 
 // print the total dimensions
 echo(total_x);
@@ -38,6 +37,10 @@ main();
 module main(){
 difference() {
 union() {
+// build the base.
+color("brown")
+cube([total_x,total_y,floor_thickness]);
+
 // build the grid
 for(i=[0:cells_x-1]) {
 		translate([0,i*(unit_length),0]){
@@ -84,7 +87,7 @@ rotate([180,0,90]){
 } // end of union
 
 // remove connector sockets
-translate([0,0,-height+2]){
+translate([0,0,-2]){
 	connector_array(h=height+5,adj=1.1,start=0,end=cells_x-1);
 }
 rotate([180,0,90]){
