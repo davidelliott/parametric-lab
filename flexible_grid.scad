@@ -12,15 +12,38 @@
 // feature- option for cells to not be square
 
 // set parameters
+// uncomment the desired pattern or provide custom settings
+
+// mini petri holder
+/*
 hole_size=50;
-wall_width=5;
-height=4;
-unit_length=hole_size+wall_width;
 cells_x=3;
 cells_y=3;
+height=4;
+floor_thickness=0; // Set 0 for no base
+*/
+
+// standard petri holder
+/*
+hole_size=90;
+cells_x=2;
+cells_y=2;
+height=4;
+floor_thickness=0; // Set 0 for no base
+*/
+
+// Universal bottle rack
+hole_size=25;
+cells_x=4;
+cells_y=4;
+height=25;
+floor_thickness=3; // Set 0 for no base
+
+
+wall_width=5;
+unit_length=hole_size+wall_width;
 total_x=unit_length*cells_x;
 total_y=unit_length*cells_y;
-floor_thickness=0.5; // Set 0 for no base
 
 // print the total dimensions
 echo(total_x);
