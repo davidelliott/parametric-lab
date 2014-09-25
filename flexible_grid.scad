@@ -33,11 +33,20 @@ floor_thickness=0; // Set 0 for no base
 */
 
 // Universal bottle rack
-hole_size=25;
+/*
+hole_size=30;
 cells_x=4;
 cells_y=4;
 height=25;
-floor_thickness=3; // Set 0 for no base
+floor_thickness=1.5; // Set 0 for no base
+*/
+
+// Cryo tube rack
+hole_size=30;
+cells_x=4;
+cells_y=4;
+height=25;
+floor_thickness=1.5; // Set 0 for no base
 
 
 wall_width=5;
@@ -81,11 +90,12 @@ rotate([180,0,90]){
 // now remove the sockets
 		
 		translate([0,0,-2]){
-			connector_array(h=height+5,adj=1.1,start=0,end=cells_x-option);
+			connector_array(h=height+5,adj=1.15,start=0,end=cells_x-option);
 		}
 	}
 
 }
+
 
 
 module main(){
@@ -93,7 +103,10 @@ difference() {
 union() {
 // build the base.
 color("brown")
-cube([total_x,total_y,floor_thickness]);
+difference(){
+	cube([total_x,total_y,floor_thickness]);
+	perforations();
+}
 
 // build the grid
 for(i=[0:cells_x-1]) {
@@ -191,19 +204,52 @@ reinforcement_part();
 }
 }
 
+
+
+
+
 module reinforcement_part() {
-r=wall_width;
-difference(){
-translate([wall_width-0.1,r,0]){
-cylinder(r=r,h=height);
+	r=wall_width;
+	difference(){
+		translate([wall_width-0.1,r,0]){
+			cylinder(r=r,h=height);
+		}
+
+		translate([-0.1,-0.1,-1]){
+			cube([r*4,wall_width,height*2]);
+			cube([wall_width-0.01,r*3,height*2]);
+		}
+
+	} // end of difference
 }
 
-translate([-0.1,-0.1,-1]){
-cube([r*4,wall_width,height*2]);
-cube([wall_width-0.01,r*3,height*2]);
+t=9%5;
+
+module perforations(rad=2.5,space=0.25){
+	perf_total = (rad*2)+space; // length of each perforation inc spacing
+	offset=perf_total/2; // offset alternate rows for better packing
+	//packing_factor - calculate spacing by Pythagoras
+	// looking for value of b in a2 + b2 = c2
+	
+	a=perf_total/2; 
+	c=perf_total;
+	
+	x_spacing = pow((c*c) - (a*a) , 1/2);
+//	perf_n=total_x/perf_total; // number of perforations needed
+	perf_x=total_x/x_spacing; // number of perforations needed
+	perf_y=total_x/perf_total; // number of perforations needed
+
+
+	for(y=[0:perf_y]) {
+		for(x=[0:perf_x]) {
+			translate([x*x_spacing,y*perf_total+(even(x)*offset),-2]) {
+				cylinder(h=floor_thickness+4,r=rad,$fn=6);
+			}
+		}
+	}
 }
-} // end of difference
-}
+
+function even(n) = n%2;
 
 
 
