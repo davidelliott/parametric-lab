@@ -42,13 +42,16 @@ floor_thickness=1.5; // Set 0 for no base
 */
 
 // Cryo tube rack
-hole_size=30;
+hole_size=11;
 cells_x=4;
 cells_y=4;
-height=25;
+height=20;
 floor_thickness=1.5; // Set 0 for no base
+//
 
 
+// calculated dimensions
+socket_enlargement=1.1+(height/500); // make the sockets slightly bigger with height increase
 wall_width=5;
 unit_length=hole_size+wall_width;
 total_x=unit_length*cells_x;
@@ -90,7 +93,7 @@ rotate([180,0,90]){
 // now remove the sockets
 		
 		translate([0,0,-2]){
-			connector_array(h=height+5,adj=1.15,start=0,end=cells_x-option);
+			connector_array(h=height+5,adj=socket_enlargement+0.05,start=0,end=cells_x-option);
 		}
 	}
 
@@ -121,7 +124,8 @@ for(i=[0:cells_y-1]) {
 		}
 }
 
-// add reinforcements
+// add reinforcements if there is no floor
+if(floor_thickness<0.1) {
 for(i=[0:cells_x-1]) {
 	
 	translate([0,i*(unit_length)+wall_width,0]){
@@ -136,7 +140,7 @@ for(i=[0:cells_y]) {
 			reinforcement(i);
 		}
 }
-
+} // end of if
 
 // add connectors
 translate([0,total_y,0]){
@@ -155,11 +159,11 @@ rotate([180,0,90]){
 
 // remove connector sockets
 translate([0,0,-2]){
-	connector_array(h=height+5,adj=1.1,start=0,end=cells_x-1);
+	connector_array(h=height+5,adj=socket_enlargement,start=0,end=cells_x-1);
 }
 rotate([180,0,90]){
 	translate([0,0,-height-2]){
-		connector_array(h=height+5,adj=1.1,start=0,end=cells_y);
+		connector_array(h=height+5,adj=socket_enlargement,start=0,end=cells_y);
 	}
 }
 
@@ -240,8 +244,8 @@ module perforations(rad=2.5,space=0.25){
 	perf_y=total_x/perf_total; // number of perforations needed
 
 
-	for(y=[0:perf_y]) {
-		for(x=[0:perf_x]) {
+	for(y=[0:perf_y-1]) {
+		for(x=[0:perf_x-1]) {
 			translate([x*x_spacing,y*perf_total+(even(x)*offset),-2]) {
 				cylinder(h=floor_thickness+4,r=rad,$fn=6);
 			}
