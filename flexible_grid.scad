@@ -49,7 +49,6 @@ height=20;
 floor_thickness=1.5; // Set 0 for no base
 //
 
-
 // calculated dimensions
 socket_enlargement=1.1+(height/500); // make the sockets slightly bigger with height increase
 wall_width=5;
@@ -60,45 +59,71 @@ total_y=unit_length*cells_y;
 // print the total dimensions
 echo(total_x);
 echo(total_y);
-
-// build the objects
-main();
-
+
+///////////////////////
+// build the objects //
+///////////////////////
+// In OpenSCAD 2014.09.05 rendering both grid and walls does not work properly
+// In OpenSCAD 2014.03 it was fine, don't know why.
+// hence here a choice to build walls or grid separately.
+
+grid=1; 
+walls=0;
+
+if(grid){
+// the main grid
+main();
+}
+
+if(walls){
+// the extra walls to close the grid.
 translate([0,total_y+wall_width*1.5,0]){
-extra_wall();
+extra_wall_b();
 }
 
 rotate([0,0,-90]){
 translate([-total_x-wall_width,total_y+wall_width*1.5,0]){
-extra_wall(option=0);
+extra_wall_a();
 }
 }
+
+}
 
 //////////////
 // MODULES //
 /////////////
 
-module extra_wall(option=1){
+module extra_wall_a(){
 	
-
 	difference(){
-	union(){
 		cube([total_x,wall_width,height]);
-rotate([180,0,90]){
-	translate([0,total_x,-height]){
-		if(option){connector_array(start=0,end=0);}
-	}
-}
-} // end of union
-// now remove the sockets
-		
 		translate([0,0,-2]){
-			connector_array(h=height+5,adj=socket_enlargement+0.05,start=0,end=cells_x-option);
+			connector_array(h=height+5,adj=socket_enlargement+0.05,start=0,end=cells_x);
 		}
 	}
-
 }
-
+
+
+
+module extra_wall_b(){
+
+	difference(){
+	union(){
+		cube([total_x,wall_width,height]);
+rotate([180,0,90]){
+	translate([0,total_x,-height]){
+		connector_array(start=0,end=0);
+	}
+}
+} // end of union
+// now remove the sockets
+		
+		translate([0,0,-2]){
+			connector_array(h=height+5,adj=socket_enlargement+0.05,start=0,end=cells_x-1);
+		}
+	}
+
+}
 
 
 module main(){
@@ -227,7 +252,6 @@ module reinforcement_part() {
 	} // end of difference
 }
 
-t=9%5;
 
 module perforations(rad=2.5,space=0.25){
 	perf_total = (rad*2)+space; // length of each perforation inc spacing
