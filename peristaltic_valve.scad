@@ -7,7 +7,8 @@
 
 // Main configurable parameters
 explode_multiplier=0; // set at zero to disable exploding the design - output will appear as finished object
-peristaltic_pipe_radius=3;
+pipe_outer_dia=6;
+pipe_bore_dia=2;
 
 pipe_spacing=19; // distance between in/out pipes where they emerge in the housing
 //bolt_radius=3.2; // M6 bolt diameter = 6mm, leave some clearance
@@ -20,10 +21,10 @@ servo_width=11.6;
 servo_depth=24; // this is the depth of the main body along the rotating axis
 //cam_axle_height=valve_height-servo_axis_z;
 cam_axle_radius=2.5;
-	roller_radius=3; // M6 rod could be used as the roller
+	roller_radius=3.25; // M6 rod could be used as the roller
 fn_resolution=30; //quality vs render time
 $fn=fn_resolution;
-housing_floor_thickness=3;
+housing_floor_thickness=0; // this var needs to be removed, part of another design
 housing_length=65;
 
 peristaltic_valve_cutout_radius=15; // better to have this a fixed size suitable for the parts being used.
@@ -37,24 +38,42 @@ cam_clearance=1;
 pipe1_y = 20;
 pipe2_y = pipe1_y+pipe_spacing;
 
+peristaltic_pipe_radius=pipe_outer_dia/2;
 ///////////////////////////////
 // calculate important dimensions
 // Some of these would be suitable for manual setting
 // The calculations just make reasonable estimates
-h_in=valve_height/3; // height of inlet pipe
-h_out=valve_height/3; // height of outlet pipe
+pinch_depth=(pipe_bore_dia*2)/3;
+
+//h_in=valve_height/3; // height of inlet pipe
+//h_out=valve_height/4; // height of outlet pipe
+
+h_in=housing_floor_thickness+valve_base_thickness+cam_clearance;
 
 valve_length=(peristaltic_valve_cutout_radius+valve_wall_thickness_x+cam_clearance)*2;
 
-cam_axle_height=h_in+peristaltic_valve_cutout_radius-peristaltic_pipe_radius;
+cam_axle_height=h_in+peristaltic_valve_cutout_radius+pinch_depth;
+
+// Note
+// cam_clearance raises up the cam a bit so it will not catch.
+// however the roller distance to the pipe should be accurate, hence
+// the cam_clearance is added to the base, raising the floor
+// i.e. the clearance applies to the cam but does not affect the pinching depth
 
 //////////////////////////////////
-show=1; // 1=printable; 2=assembled
+show=2; // 1=printable; 2=assembled; 3=testing
+
+if(show==3) {
+intersection(){
+cam();
+peristaltic_valve();
+}
+}
 
 if(show==2) {
 /// Show complete assembly ///
 // add the peristaltic valve
-color("orange")
+//color("orange")
 peristaltic_valve();
 
 // add the valve cam
@@ -110,8 +129,6 @@ cam_roller_length=valve_cutout_y-(0.5*valve_wall_thickness_y)-(0.5*cam_clearance
 /////////////
 // MODULES //
 /////////////
-
-
 
 module cam(explode=0) {
 explode=explode*explode_multiplier;
@@ -187,17 +204,16 @@ explode=explode*explode_multiplier;
 
 }
 
-
 // servo - this is not part of the design but it's shape needs to be subtracted from some parts
 module servo(explode=0) {
 explode=explode*explode_multiplier;
 	bracket_length=34;
 	bracket_offset_y=2.5;
 bracket_thickness=0.5;
-rotor_drive_depth=3.5;
-rotor_thickness=3.5;
+rotor_drive_depth=6;
+rotor_thickness=3.8;
 rotor_length=17;
-rotor_depth=4;
+rotor_depth=5;
 servo_depth_full=servo_depth+rotor_drive_depth;
 first_hole=(servo_length-servo_hole_spacing)/2;
 
@@ -271,12 +287,12 @@ difference(){
 		}
 	}
 	// cut out a path for the outlet pipe
-	translate([valve_xpos-1,pipe1_y-peristaltic_pipe_radius,h_in-peristaltic_pipe_radius+explode]){
-		cube([housing_length+1,peristaltic_pipe_radius*2,valve_height]);
+	translate([valve_xpos-1,pipe1_y-peristaltic_pipe_radius,h_in+cam_clearance-pinch_depth+explode]){
+		cube([housing_length+1,pipe_outer_dia,valve_height]);
 	}
 	
 	// cut out a path for the intlet pipe
-	translate([valve_xpos-1,pipe2_y-peristaltic_pipe_radius,h_in-peristaltic_pipe_radius+explode]){
+	translate([valve_xpos-1,pipe2_y-peristaltic_pipe_radius,h_in+cam_clearance-pinch_depth+explode]){
 		cube([housing_length+1,peristaltic_pipe_radius*2,valve_height]);
 	}
 
