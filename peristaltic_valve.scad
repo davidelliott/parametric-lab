@@ -21,7 +21,7 @@ servo_width=11.6;
 servo_depth=24; // this is the depth of the main body along the rotating axis
 //cam_axle_height=valve_height-servo_axis_z;
 cam_axle_radius=2.5;
-	roller_radius=3.25; // M6 rod could be used as the roller
+	roller_radius=3.15; // M6 rod could be used as the roller
 fn_resolution=30; //quality vs render time
 $fn=fn_resolution;
 housing_floor_thickness=0; // this var needs to be removed, part of another design
@@ -33,7 +33,7 @@ valve_wall_thickness_y=4; // sides where the axis / servo are
 valve_wall_thickness_x=6; // front and back
 valve_base_thickness=3;
 valve_base_length=10;
-cam_clearance=1;
+cam_clearance=2;
 
 pipe1_y = 20;
 pipe2_y = pipe1_y+pipe_spacing;
@@ -44,6 +44,7 @@ peristaltic_pipe_radius=pipe_outer_dia/2;
 // Some of these would be suitable for manual setting
 // The calculations just make reasonable estimates
 pinch_depth=(pipe_bore_dia*2)/3;
+axle_length=(2*cam_clearance)+valve_wall_thickness_y;
 
 //h_in=valve_height/3; // height of inlet pipe
 //h_out=valve_height/4; // height of outlet pipe
@@ -61,7 +62,7 @@ cam_axle_height=h_in+peristaltic_valve_cutout_radius+pinch_depth;
 // i.e. the clearance applies to the cam but does not affect the pinching depth
 
 //////////////////////////////////
-show=2; // 1=printable; 2=assembled; 3=testing
+show=1; // 1=printable; 2=assembled; 3=testing
 
 if(show==3) {
 intersection(){
@@ -123,7 +124,7 @@ valve_width=pipe_spacing*3;
 valve_length_middle=valve_xpos+(valve_length/2);
 valve_cutout_y=valve_width-(2*valve_wall_thickness_y); //offset+chamber_wall_thickness/2;
 valve_ypos=0;
-cam_roller_length=valve_cutout_y-(0.5*valve_wall_thickness_y)-(0.5*cam_clearance);
+cam_roller_length=valve_cutout_y-(0.5*valve_wall_thickness_y)-(1*cam_clearance);
 
 
 /////////////
@@ -132,7 +133,7 @@ cam_roller_length=valve_cutout_y-(0.5*valve_wall_thickness_y)-(0.5*cam_clearance
 
 module cam(explode=0) {
 explode=explode*explode_multiplier;
-axle_length=(2*cam_clearance)+valve_wall_thickness_y;
+
 
 	// Build a cylinder then cut parts away.
 	difference(){
@@ -166,16 +167,16 @@ axle_length=(2*cam_clearance)+valve_wall_thickness_y;
 
 		// cut out a hole for the roller to go in
 		// the hole is offset so it is only open at one end
-		translate([valve_length_middle,valve_ypos+valve_cutout_y+(0.5*valve_wall_thickness_y),cam_axle_height-peristaltic_valve_cutout_radius+cam_clearance+roller_radius+explode]){
+		translate([valve_length_middle,valve_ypos+valve_cutout_y+(1.25*valve_wall_thickness_y),cam_axle_height-peristaltic_valve_cutout_radius+cam_clearance+roller_radius+explode]){
 			rotate([90,0,0]) {
-				cylinder(r=roller_radius+0.1,h=valve_cutout_y,$fn=fn_resolution);
+				cylinder(r=roller_radius+0.1,h=cam_roller_length,$fn=fn_resolution);
 			}
 		}
 
 		// cut off the sharp edge on the roller hole
-		translate([valve_length_middle,valve_ypos+valve_cutout_y+(0.5*valve_wall_thickness_y),cam_axle_height-peristaltic_valve_cutout_radius+cam_clearance+explode]){
+		translate([valve_length_middle,valve_ypos+valve_cutout_y+(1.25*valve_wall_thickness_y),cam_axle_height-peristaltic_valve_cutout_radius+cam_clearance+explode]){
 			rotate([90,0,0]) {
-				cylinder(r=0.75*(roller_radius+0.1),h=valve_cutout_y,$fn=fn_resolution);
+				cylinder(r=0.75*(roller_radius+0.1),h=cam_roller_length,$fn=fn_resolution);
 			}
 		}
 	
@@ -203,6 +204,7 @@ explode=explode*explode_multiplier;
 		}
 
 }
+
 
 // servo - this is not part of the design but it's shape needs to be subtracted from some parts
 module servo(explode=0) {
@@ -240,7 +242,7 @@ first_hole=(servo_length-servo_hole_spacing)/2;
 	// rotor drive
 	translate([servo_length-servo_axis_x,servo_depth_full+0.01,servo_width/2]){
 		rotate([90,0,0]){
-		cylinder(d=15,h=rotor_drive_depth);
+		cylinder(d=18,h=rotor_drive_depth);
 		}
 	}
 
@@ -270,7 +272,6 @@ module peristaltic_valve(explode=0) {
 explode=explode*explode_multiplier;
 
 first_hole=(servo_length-servo_hole_spacing)/2;
-
 // Build the main control surface: a cuboid with cylindrical cutout
 difference(){
 	// A cuboid from which we will cut away to make the shape
@@ -305,6 +306,13 @@ difference(){
 		}
 	}
 	
+	// axle hole
+	translate([valve_length_middle,valve_ypos+valve_cutout_y+valve_wall_thickness_y-(0.5*cam_clearance)+axle_length+0.01,cam_axle_height+explode]){
+		rotate([90,0,0]) {
+			cylinder(r=cam_axle_radius,h=valve_cutout_y-cam_clearance+axle_length,$fn=fn_resolution);
+		}
+	}
+
 	// cut out a hole where the servo will be mounted
 	translate([valve_length_middle-servo_length+servo_axis_x,valve_ypos-1,cam_axle_height-servo_axis_z+explode]){
 	cube([servo_length,7.3,servo_width+1]);
