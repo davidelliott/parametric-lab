@@ -20,9 +20,9 @@ servo_axis_x=7; // manual measurement - not shown on data sheet
 servo_width=11.6;
 servo_depth=24; // this is the depth of the main body along the rotating axis
 //cam_axle_height=valve_height-servo_axis_z;
-cam_axle_radius=2.5;
+cam_axle_radius=3;
 	roller_radius=3.15; // M6 rod could be used as the roller
-fn_resolution=30; //quality vs render time
+fn_resolution=70; //quality vs render time
 $fn=fn_resolution;
 housing_floor_thickness=0; // this var needs to be removed, part of another design
 housing_length=65;
@@ -145,7 +145,7 @@ explode=explode*explode_multiplier;
 		}
 
 		// cut off the top which is not needed
-		translate([valve_xpos,valve_ypos,cam_axle_height+servo_axis_z+1+explode]){
+		translate([valve_xpos,valve_ypos,cam_axle_height+servo_axis_z-1+explode]){
 			cube([valve_length,valve_width,servo_width+1]);
 		}
 
@@ -295,6 +295,11 @@ difference(){
 	// cut out a path for the intlet pipe
 	translate([valve_xpos-1,pipe2_y-peristaltic_pipe_radius,h_in+cam_clearance-pinch_depth+explode]){
 		cube([housing_length+1,peristaltic_pipe_radius*2,valve_height]);
+	}
+
+	// cut off the top of the middle bit which is not needed
+	translate([valve_xpos-1,pipe1_y-peristaltic_pipe_radius+1,h_in+cam_clearance-pinch_depth+peristaltic_pipe_radius*2+explode]){
+		cube([housing_length+1,pipe2_y-pipe1_y,valve_height]);
 	}
 
 	}
