@@ -7,7 +7,7 @@
 
 // Main configurable parameters
 explode_multiplier=0; // set at zero to disable exploding the design - output will appear as finished object
-pipe_outer_dia=6;
+pipe_outer_dia=3;
 pipe_bore_dia=2;
 
 pipe_spacing=19; // distance between in/out pipes where they emerge in the housing
@@ -43,7 +43,9 @@ peristaltic_pipe_radius=pipe_outer_dia/2;
 // calculate important dimensions
 // Some of these would be suitable for manual setting
 // The calculations just make reasonable estimates
-pinch_depth=(pipe_bore_dia*2)/3;
+// pinch_depth=(pipe_bore_dia*2)/3;
+pinch_depth=(pipe_bore_dia);
+
 axle_length=(2*cam_clearance)+valve_wall_thickness_y;
 
 //h_in=valve_height/3; // height of inlet pipe
@@ -53,7 +55,7 @@ h_in=housing_floor_thickness+valve_base_thickness+cam_clearance;
 
 valve_length=(peristaltic_valve_cutout_radius+valve_wall_thickness_x+cam_clearance)*2;
 
-cam_axle_height=h_in+peristaltic_valve_cutout_radius+pinch_depth;
+cam_axle_height=h_in+peristaltic_valve_cutout_radius-pinch_depth;
 
 // Note
 // cam_clearance raises up the cam a bit so it will not catch.
@@ -109,7 +111,7 @@ servo();
 
 translate([40,0,cam_roller_length]){
 rotate([270,0,0]){
-cam_roller();
+//cam_roller();
 }
 }
 
