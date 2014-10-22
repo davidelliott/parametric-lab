@@ -1,0 +1,37 @@
+// Some parameter examples for flexible_grid.scad
+
+// mini petri holder
+/*
+hole_size=50;
+cells_x=3;
+cells_y=3;
+height=4;
+floor_thickness=0; // Set 0 for no base
+*/
+
+// standard petri holder
+/*
+hole_size=90;
+cells_x=2;
+cells_y=2;
+height=4;
+floor_thickness=0; // Set 0 for no base
+*/
+
+// Universal bottle rack
+/*
+hole_size=30;
+cells_x=4;
+cells_y=4;
+height=25;
+floor_thickness=1.5; // Set 0 for no base
+*/
+
+// Cryo tube rack
+/*
+hole_size=11;
+cells_x=4;
+cells_y=4;
+height=20;
+floor_thickness=1.5; // Set 0 for no base
+*/

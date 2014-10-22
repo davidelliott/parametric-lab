@@ -12,34 +12,7 @@
 // feature- option for cells to not be square
 
 // set parameters
-// uncomment the desired pattern or provide custom settings
-
-// mini petri holder
-/*
-hole_size=50;
-cells_x=3;
-cells_y=3;
-height=4;
-floor_thickness=0; // Set 0 for no base
-*/
-
-// standard petri holder
-/*
-hole_size=90;
-cells_x=2;
-cells_y=2;
-height=4;
-floor_thickness=0; // Set 0 for no base
-*/
-
-// Universal bottle rack
-/*
-hole_size=30;
-cells_x=4;
-cells_y=4;
-height=25;
-floor_thickness=1.5; // Set 0 for no base
-*/
+wall_width=5;
 
 // Cryo tube rack
 hole_size=11;
@@ -51,7 +24,6 @@ floor_thickness=1.5; // Set 0 for no base
 
 // calculated dimensions
 socket_enlargement=1.1+(height/500); // make the sockets slightly bigger with height increase
-wall_width=5;
 unit_length=hole_size+wall_width;
 total_x=unit_length*cells_x;
 total_y=unit_length*cells_y;
@@ -59,23 +31,23 @@ total_y=unit_length*cells_y;
 // print the total dimensions
 echo(total_x);
 echo(total_y);
-
+
 ///////////////////////
-// build the objects //
-///////////////////////
-// In OpenSCAD 2014.09.05 rendering both grid and walls does not work properly
-// In OpenSCAD 2014.03 it was fine, don't know why.
-// hence here a choice to build walls or grid separately.
-
-grid=1; 
-walls=0;
-
-if(grid){
-// the main grid
-main();
-}
-
-if(walls){
+// build the objects //
+///////////////////////
+// In OpenSCAD 2014.09.05 rendering both grid and walls does not work properly
+// In OpenSCAD 2014.03 it was fine, don't know why.
+// hence here a choice to build walls or grid separately.
+
+grid=1; // build the main grid [0,1]
+walls=0; // build extra walls [0,1]
+
+if(grid){
+// the main grid
+main();
+}
+
+if(walls){
 // the extra walls to close the grid.
 translate([0,total_y+wall_width*1.5,0]){
 extra_wall_b();
@@ -86,8 +58,8 @@ translate([-total_x-wall_width,total_y+wall_width*1.5,0]){
 extra_wall_a();
 }
 }
-
-}
+
+}
 
 //////////////
 // MODULES //
@@ -102,27 +74,27 @@ module extra_wall_a(){
 		}
 	}
 }
-
-
-
-module extra_wall_b(){
-
-	difference(){
-	union(){
-		cube([total_x,wall_width,height]);
-rotate([180,0,90]){
-	translate([0,total_x,-height]){
-		connector_array(start=0,end=0);
-	}
-}
-} // end of union
-// now remove the sockets
-		
-		translate([0,0,-2]){
-			connector_array(h=height+5,adj=socket_enlargement+0.05,start=0,end=cells_x-1);
-		}
-	}
-
+
+
+
+module extra_wall_b(){
+
+	difference(){
+	union(){
+		cube([total_x,wall_width,height]);
+rotate([180,0,90]){
+	translate([0,total_x,-height]){
+		connector_array(start=0,end=0);
+	}
+}
+} // end of union
+// now remove the sockets
+		
+		translate([0,0,-2]){
+			connector_array(h=height+5,adj=socket_enlargement+0.05,start=0,end=cells_x-1);
+		}
+	}
+
 }
 
 
