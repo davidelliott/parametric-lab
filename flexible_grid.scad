@@ -8,11 +8,10 @@
 // Design is not fully parameterised
 
 // TO DO / known problems
-// bug- Grid has to be a square - i.e. cells_x = cells_y
-// feature- option for cells to not be square
+// May 2016, Richard Pillay - fixed bug which did odd things when grid was not square - i.e. cells_x != cells_y
 
 // set parameters
-wall_width=5;
+wall_width=5;
 
 // Cryo tube rack
 hole_size=11;
@@ -38,6 +37,7 @@ echo(total_y);
 // In OpenSCAD 2014.09.05 rendering both grid and walls does not work properly
 // In OpenSCAD 2014.03 it was fine, don't know why.
 // hence here a choice to build walls or grid separately.
+// OpenSCAD 2015.03 has fixed it again, so feel free to use both.
 
 grid=1; // build the main grid [0,1]
 walls=0; // build extra walls [0,1]
@@ -108,14 +108,15 @@ difference(){
 	perforations();
 }
 
-// build the grid
-for(i=[0:cells_x-1]) {
+// build the grid (Inner Walls)
+
+for(i=[0:cells_y-1]) {
 		translate([0,i*(unit_length),0]){
 			cube([total_x,wall_width,height]);
 		}
 	}
 
-for(i=[0:cells_y-1]) {
+for(i=[0:cells_x-1]) {
 		translate([i*(unit_length),0,0]){
 			cube([wall_width,total_y,height]);
 		}
@@ -137,16 +138,16 @@ for(i=[0:cells_y]) {
 			reinforcement(i);
 		}
 }
-} // end of if
+} // end of if floor_thickness
 
 // add connectors
 translate([0,total_y,0]){
-connector_array(start=0,end=cells_y-1);
+connector_array(start=0,end=cells_x-1);
 }
 
 rotate([180,0,90]){
 	translate([0,total_x,-height]){
-		connector_array(start=0,end=cells_x-1);
+		connector_array(start=0,end=cells_y-1);
 	}
 }
 
@@ -237,7 +238,7 @@ module perforations(rad=2.5,space=0.25){
 	x_spacing = pow((c*c) - (a*a) , 1/2);
 //	perf_n=total_x/perf_total; // number of perforations needed
 	perf_x=total_x/x_spacing; // number of perforations needed
-	perf_y=total_x/perf_total; // number of perforations needed
+	perf_y=total_y/perf_total; // number of perforations needed
 
 
 	for(y=[0:perf_y-1]) {
